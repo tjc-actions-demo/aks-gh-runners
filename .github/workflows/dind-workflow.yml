@@ -1,4 +1,4 @@
-name: Hello World Demo
+name: Docker-in-Docker Workflow
 run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
 
 on:
