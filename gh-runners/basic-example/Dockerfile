@@ -10,6 +10,7 @@ RUN echo "dash dash/sh boolean false" | debconf-set-selections
 RUN apt update
 RUN apt upgrade -y
 RUN apt install -y \
+    ca-certificates \
     curl \
     git \
     libicu-dev \
