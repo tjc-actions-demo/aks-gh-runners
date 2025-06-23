@@ -1,33 +1,46 @@
-FROM ubuntu:22.04
+FROM ubuntu:22.04 AS base
 ARG GITHUB_RUNNER_VERSION=2.325.0
 ARG DEBIAN_FRONTEND=noninteractive
 
+ENV DEBIAN_FRONTEND=${DEBIAN_FRONTEND}
 ENV GITHUB_RUNNER_VERSION=${GITHUB_RUNNER_VERSION}
 ENV TZ=America/New_York
 
-RUN echo "dash dash/sh boolean false" | debconf-set-selections
+# Install dependencies
+RUN apt-get update
 
-RUN apt update
-RUN apt upgrade -y
-RUN apt install -y \
+RUN apt-get install -y \
     ca-certificates \
     curl \
-    git \
-    libicu-dev \
-    jq
-
-# Install Docker dependencies
-RUN apt install -y \
     dbus-user-session \
     fuse-overlayfs \
+    gnupg2 \
     iptables \
+    jq \
     kmod \
     lsb-release \
     slirp4netns \
+    software-properties-common \
     sudo \
     uidmap
 
-RUN apt clean
+RUN rm -rf /var/lib/apt/lists/*
+
+RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg && \
+    echo \
+      "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] \
+      https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" \
+      > /etc/apt/sources.list.d/docker.list
+
+RUN apt-get update
+
+RUN apt-get install -y --no-install-recommends \
+    containerd.io \
+    docker-buildx-plugin \
+    docker-ce \
+    docker-ce-cli
+
+RUN apt-get install -y docker-ce-rootless-extras=5:25.0.3-1~ubuntu.22.04~jammy --allow-downgrades
 
 RUN mkdir /runner
 WORKDIR /runner
@@ -39,20 +52,20 @@ RUN rm -rf ./actions-runner.tar.gz
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
-RUN groupadd --gid 1001 runner && useradd --uid 1001 --gid runner --shell /bin/bash --create-home runner
+RUN groupadd --gid 1001 runner
+RUN useradd --uid 1001 --gid runner --shell /bin/bash --create-home runner
 RUN chown -R runner:runner /runner /entrypoint.sh
 RUN echo "runner ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
 USER runner
 ENV USER=runner
-WORKDIR /home/runner
+ENV HOME=/home/runner
 
-# Download Docker rootless installer (but don't run it during build)
-RUN curl -o install_docker_rootless.sh -fsSL https://get.docker.com/rootless
-RUN chmod +x install_docker_rootless.sh
+# Set up environment variables for rootless Docker
+ENV PATH=/home/runner/bin:$PATH
+ENV DOCKER_HOST=unix:///run/user/1001/docker.sock
 
-# Setup environment variables for rootless Docker
-ENV PATH=$PATH:/home/runner/bin
-ENV DOCKER_HOST=unix:///home/runner/.docker/run/docker.sock
+# Install Docker rootless
+RUN dockerd-rootless-setuptool.sh install --skip-iptables
 
 ENTRYPOINT [ "/entrypoint.sh" ]
