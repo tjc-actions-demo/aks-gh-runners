@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  hello-world:
+  dind-job:
     runs-on: [self-hosted, dind]
     steps:
       - name: Checkout repository
