@@ -1,0 +1,17 @@
+name: 'Ping Action'
+description: Pings the specified host and returns the response.
+inputs:
+  host:
+    default: '8.8.8.8'
+    description: The host to ping. Defaults to Google's public DNS server (8.8.8.8).
+    required: false
+  count:
+    default: '4'
+    description: The number of ping requests to send. Defaults to 4.
+    required: false
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  args:
+    - '${{ inputs.host }}'
+    - '${{ inputs.count }}'
