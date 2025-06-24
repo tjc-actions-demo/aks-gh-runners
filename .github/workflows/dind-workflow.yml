@@ -13,6 +13,11 @@ jobs:
     
       - name: Check Docker Version
         run: docker version
+
+      - name: Build Docker Image
+        run: |
+          docker build -t ping-action .
+        working-directory: ./actions/ping-action
         
       - name: Run Ping Action
         uses: ./actions/ping-action
