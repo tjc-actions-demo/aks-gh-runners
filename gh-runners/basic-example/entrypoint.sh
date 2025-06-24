@@ -28,16 +28,18 @@ api_url="https://api.github.com/orgs/${GH_ORG}/actions/runners/generate-jitconfi
 body="{\"name\":\"$(hostname)\", \"labels\": [${labels_string#,}], \"runner_group_id\":${GH_RUNNER_GROUP_ID}}"
 
 echo "Requesting JIT config from GitHub API..."
-encoded_jit_config=$(
+post_response=$(
     curl -sSL -X POST "$api_url" \
         -H "Accept: application/vnd.github+json" \
         -H "Authorization: Bearer $GH_TOKEN" \
-        -d "$body" \
-        | jq -r '.encoded_jit_config'
+        -d "$body"
 )
+
+encoded_jit_config=$(echo "$post_response" | jq -r '.encoded_jit_config')
 
 if [[ -z "$encoded_jit_config" || "$encoded_jit_config" == "null" ]]; then
   echo "Failed to get encoded_jit_config from GitHub API."
+  echo "Response: $post_response"
   exit 2
 fi
 
