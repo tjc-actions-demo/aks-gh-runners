@@ -14,5 +14,8 @@ jobs:
       - name: Check Docker Version
         run: docker version
         
-      # - name: Display GitHub Context
-      #   run: echo "This workflow was triggered by ${{ github.actor }} on ${{ github.event_name }} event."
+      - name: Run Ping Action
+        uses: ./actions/ping-action
+        with:
+          host: google.com
+          count: 3
