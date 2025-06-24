@@ -1,31 +1,23 @@
 #!/bin/bash
 set -euo pipefail
 
-# Install Docker rootless at runtime if not already installed
-# if [[ ! -f "/home/runner/bin/docker" ]]; then
-#     echo "Installing Docker rootless..."
-#     cd /home/runner
-#     ./install_docker_rootless.sh --skip-iptables --force
-#     echo "Docker rootless installation completed."
-# fi
-
 # Start Docker daemon in background
-# echo "Starting Docker daemon..."
-# /home/runner/bin/dockerd-rootless.sh &
+echo "Starting Docker daemon..."
+export XDG_RUNTIME_DIR=/run/user/$(id -u)
+dockerd-rootless.sh &
 
 # Wait for Docker to be ready
-# echo "Waiting for Docker to be ready..."
-# timeout=30
-# while ! /home/runner/bin/docker info >/dev/null 2>&1; do
-#     sleep 1
-#     timeout=$((timeout - 1))
-#     if [[ $timeout -eq 0 ]]; then
-#         echo "Docker failed to start within 30 seconds"
-#         sudo dmesg
-#         exit 1
-#     fi
-# done
-# echo "Docker is ready!"
+echo "Waiting for Docker to be ready..."
+timeout=30
+while ! docker info >/dev/null 2>&1; do
+    sleep 1
+    timeout=$((timeout - 1))
+    if [[ $timeout -eq 0 ]]; then
+        echo "Docker failed to start within 30 seconds"
+        exit 1
+    fi
+done
+echo "Docker is ready!"
 
 if [[ -z "${GH_TOKEN:-}" || -z "${GH_ORG:-}" || -z "${GH_RUNNER_GROUP_ID:-}" ]]; then
     echo "Error: GH_TOKEN, GH_ORG, and GH_RUNNER_GROUP_ID environment variables must be set."
