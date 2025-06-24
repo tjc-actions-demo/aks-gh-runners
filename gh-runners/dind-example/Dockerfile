@@ -15,10 +15,12 @@ RUN apt-get install -y \
     dbus-user-session \
     fuse-overlayfs \
     gnupg2 \
+    iproute2 \
     iptables \
     jq \
     kmod \
     lsb-release \
+    mlocate \
     slirp4netns \
     software-properties-common \
     sudo \
@@ -52,9 +54,11 @@ RUN rm -rf ./actions-runner.tar.gz
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
+RUN mkdir -p /run/user/1001
+
 RUN groupadd --gid 1001 runner
 RUN useradd --uid 1001 --gid runner --shell /bin/bash --create-home runner
-RUN chown -R runner:runner /runner /entrypoint.sh
+RUN chown -R runner:runner /runner /entrypoint.sh /run/user/1001
 RUN echo "runner ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
 USER runner
