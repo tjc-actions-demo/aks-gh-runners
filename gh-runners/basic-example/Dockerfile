@@ -21,7 +21,7 @@ RUN apt clean
 RUN mkdir /runner
 WORKDIR /runner
 
-RUN curl -o actions-runner.tar.gz -L https://github.com/actions/runner/releases/download/v${GITHUB_RUNNER_VERSION}/actions-runner-linux-x64-${GITHUB_RUNNER_VERSION}.tar.gz
+RUN curl -o actions-runner.tar.gz -fsSL https://github.com/actions/runner/releases/download/v${GITHUB_RUNNER_VERSION}/actions-runner-linux-x64-${GITHUB_RUNNER_VERSION}.tar.gz
 RUN tar xzf ./actions-runner.tar.gz
 RUN rm -rf ./actions-runner.tar.gz
 
