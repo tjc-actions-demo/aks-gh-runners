@@ -1,0 +1,11 @@
+name: 'Curl Action'
+description: Downloads the web page at the specified address.
+inputs:
+  url:
+    description: The URL of the site to download the web page from.
+    required: true
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  args:
+    - '${{ inputs.url }}'
