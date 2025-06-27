@@ -3,7 +3,10 @@ set -euo pipefail
 
 # Start Docker daemon in background
 echo "Starting Docker daemon..."
-export XDG_RUNTIME_DIR=/run/user/$(id -u)
+export XDG_RUNTIME_DIR=/home/runner/.docker/run
+export PATH=/usr/bin:$PATH
+export DOCKER_HOST=unix:///home/runner/.docker/run/docker.sock
+
 dockerd-rootless.sh &
 
 # Wait for Docker to be ready

@@ -9,6 +9,8 @@ ENV TZ=America/New_York
 # Install dependencies
 RUN apt-get update
 
+RUN apt-get upgrade -y
+
 RUN apt-get install -y \
     ca-certificates \
     curl \
@@ -64,10 +66,6 @@ RUN echo "runner ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 USER runner
 ENV USER=runner
 ENV HOME=/home/runner
-
-# Set up environment variables for rootless Docker
-ENV PATH=/home/runner/bin:$PATH
-ENV DOCKER_HOST=unix:///run/user/1001/docker.sock
 
 # Install Docker rootless
 RUN dockerd-rootless-setuptool.sh install --skip-iptables
