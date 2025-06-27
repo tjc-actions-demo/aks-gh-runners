@@ -5,7 +5,7 @@ ENV TZ=America/New_York
 # Install dependencies
 RUN apt-get update
 
-RUN apt-get install -y curl
+RUN apt-get install -y curl iproute2
 
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
