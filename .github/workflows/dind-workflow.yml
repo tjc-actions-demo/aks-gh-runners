@@ -16,11 +16,10 @@ jobs:
 
       - name: Build Docker Image
         run: |
-          docker build -t ping-action .
-        working-directory: ./actions/ping-action
+          docker build -t curl-action .
+        working-directory: ./actions/curl-action
         
       - name: Run Ping Action
-        uses: ./actions/ping-action
+        uses: ./actions/curl-action
         with:
-          host: google.com
-          count: 3
+          url: https://www.google.com
